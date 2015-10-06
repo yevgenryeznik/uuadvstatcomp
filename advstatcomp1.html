@@ -1,7 +1,38 @@
 ﻿<!DOCTYPE html>
 
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
+    <style>
+        code, samp, kbd {
+	font-family: "Courier New", Courier, monospace, sans-serif;
+	text-align: left;
+	color: #555;
+            font-size: 13px;
+	}
+pre code {
+	line-height: 1.6em;	
+    font-size: 11px;
+	}
+pre {
+	padding: 0.1em 0.5em 0.3em 0.7em;
+	border-left: 11px solid #ccc;
+	margin: 1.7em 0 1.7em 0.3em;
+	overflow: auto;
+	width: 93%;
+	}
+/* target IE7 and IE6 */
+*:first-child+html pre {
+	padding-bottom: 2em;
+	overflow-y: hidden;
+	overflow: visible;
+	overflow-x: auto; 
+	}
+* html pre { 
+	padding-bottom: 2em;
+	overflow: visible;
+	overflow-x: auto;
+	}
+    </style>
     <meta charset="utf-8" />
     <title></title>
 </head>
@@ -14,22 +45,19 @@
         <p>For Windows and Mac, go to the R webiste (or really a local mirror, like the one in <a href="http://ftp.acc.umu.se/mirror/CRAN/">Umeå</a>). Download the 3.2.2 release for your OS and get it installed.</p>
         <p>If you are using Linux, you are probably better off using the package manager for your Linux distribution. For Ubuntu, you need to install the packages <code>r-base</code> and <code>r-base-dev</code>. There are several ways to do this, from a console, you can write:</p>
         <pre>
-    sudo apt-get update
-    sudo apt-get install r-base
-    sudo apt-get install r-base-dev
-</pre>
+sudo apt-get update
+sudo apt-get install r-base
+sudo apt-get install r-base-dev</pre>
         <p>For distributions based on Fedora, things are pretty similar, while infinitely different:</p>
 <pre>
-sudo yum install R
-</pre>
+sudo yum install R</pre>
         <p>If you are using something based on Red Hat Enterprise Linux, CentOS, etc, the line above might not work. If so, you first need to allow it finding a repository that includes the R packages. </p>
         <p>Depending on what your overall distribution is (the teaching assistants and/or the command <code>uname -a</code> might help out with that), use one of the three following lines:
         </p>
         <pre>
-            sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
-            sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm'
-            sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm'
-        </pre>
+sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm'
+sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm'</pre>
         <p>On UPPMAX nodes, you can use <code>module load R</code>. However, UPPMAX is down today, and it's always useful to be able to test stuff locally (on your own laptop).</p>
     </section>
 
@@ -39,55 +67,45 @@ sudo yum install R
         of data that can be used for analysis. Note that even many real packages also contain datasets, in order to demonstrate different functionality, providing calibratin data etc.</p>
         <p>To use a library, you need to load it. Since <code>datasets</code> is already installed, this is simple.</p>
         <pre>
-    library(datasets)
-</pre>
+library(datasets)</pre>
         <p>You might be curious what's in the library. If you want help with any specific word in R, just type a question mark before it.</p>
         <pre>
-    ?datasts
-</pre>
+?datasets</pre>
         <p>OK, that was not too helpful, but at least we got an instruction what to write instead.</p>
         <pre>
-            library(help="datasets")
-        </pre>
+library(help="datasets")</pre>
         <p>As you can see, there are loads of datasets here. None of them is extremely large, but they range from time series to spatial tables to more structured data.
         We will go for structured data, since that is more interesting from the perspective of demonstrating the
         data-handling features of R. We will use the <code>state</code> dataset.</p>
         <pre>data("state")</pre>
         <p>This loads several variables into our workspace. Try writing state. and then pressing tab.</p>
         <pre>
-            state.<em>TAB</em>
-            state.abb      state.area     state.center   state.division state.name state.region   state.x77    
-        </pre>
+state.<em>TAB</em>
+state.abb      state.area     state.center   state.division state.name state.region   state.x77    </pre>
         <p>Remember, if you're curious, just read the help. You will need to know what these different variables contain in order to solve the following tasks.</p>
         <pre>
         ?state
         </pre>
         <p>The most complex part of the dataset is <code>state.x77</code>. Have a look at it:</p>
         <pre>
-            state.x77
-            <em>Table shown when you press Enter.</em>
-        </pre>
+state.x77
+<em>Table shown when you press Enter.</em></pre>
         <p>You can easily access subsets of objects in R. This can be done by ordinal indices starting at 1, i.e. to get the first row, you can write:</p>
         <pre>
-            state.x77[1,]
-        </pre>
+state.x77[1,]</pre>
         <p>Note that you can leave out the second index to get "everything".</p>
         <p>What's more special about R is that you can also address by name.</p>
         <pre>
-            state.x77["Wyoming",]
-        </pre>
+state.x77["Wyoming",]</pre>
         <p>Rows as well as columns can have names and be indexed by them. Maybe we only want the income data</p>
         <pre>
-            state.x77[,"Income"]
-        </pre>
+state.x77[,"Income"]</pre>
         <p>You can also index by vectors or lists, rather than individual indices. Remember, to create a vector in R, you use the function <code>c</code>.</p>
         <pre>
-            state.x77[,c("Income", "Murder")]    
-        </pre>
+state.x77[,c("Income", "Murder")]</pre>
         <p>Now try to create a small 2 by 2 array with only the illiteracy and high-school graduation data for the states of New York and Idaho. Ask if you don't get it right.</p>
         <pre>
-        state.x77<em>.....</em>
-</pre>
+state.x77<em>.....</em></pre>
         <p>Indices can also be logical, i.e. a set of true/false values that matches the length of the dimension you are addressing.</p>
         <pre>state.x77[state.region=="Northeast",]</pre>
     </section>
@@ -122,9 +140,8 @@ sudo yum install R
         <p>You might need to specify from what server you want to make the download. Just choose one in Europe, it doesn't matter a a whole lot.</p>
         <p>Now you have access to the sm package. Easy, right? Let's try it.</p>
         <pre>
-            library(sm)
-            smresults <- sm.regression(state.x77[,"Income"], state.x77[,"Murder"])
-        </pre>
+library(sm)
+smresults <- sm.regression(state.x77[,"Income"], state.x77[,"Murder"])</pre>
         <p>A plot is automatically generated. Look in the help for <code>sm.regression</code> to find out how you would turn it off.</p>
         <p>The ease of installing packages and the standard ways of representing data in R makes it very easy to test out new approaches.</p>
     </section>
@@ -169,16 +186,14 @@ sudo yum install R
         <p>You might need to change the current directory to where you cloned your git repository, there is an option for that on the File menu. You can also use a function <code>setwd("/path/to/new/dir")</code></p>.
         <p>Nothing happens! What is going on? Eventually, you may hit the red stop button in R to stop the script execution, but you get no more information. It can help to stop the program where the error happens and inspect it. Write the following:</p>
         <pre>
-            options(error = recover)
-        </pre>
+options(error = recover)</pre>
         <p>This means that the function <code>recover</code> will be called when an error happens. If you go fancy, you can add your own special error handling. Stopping the program with the red stop button is an error in this context.</p>
         <p>Source the file again. Press the stop button after a while. What happens? You get something like this:</p>
         <pre>Enter a frame number, or 0 to exit   
 
 1: source("rolldice.R")
 2: eval.with.vis(ei, envir)
-3: eval.with.vis(expr, envir, enclos)
-</pre>
+3: eval.with.vis(expr, envir, enclos)</pre>
         <p>Here, you can see what functions are internally called by <code>source</code> to actually evaluate the source of the R file.</p>
         <p>We want to look at the innermost context. When you are debugging in other cases, it is quite likely that a weird behavior you're seeing
             is triggered further out. Type 3 and press Enter. Now you can look at all variables that were available before the code was stopped. Just print
@@ -204,8 +219,7 @@ sudo yum install R
             Save the fixed script file. Now, you can happily commit your fix to the repository.
         </p>
         <pre>
-            git commit -m "Some message explaining what change you made" rolldice.R
-        </pre>
+git commit -m "Some message explaining what change you made" rolldice.R</pre>
         <p>
             Check your github version of the repository again. Do you see the fix?
         </p>
@@ -213,8 +227,7 @@ sudo yum install R
             You shouldn't see it, since it was only committed to your <em>local</em> repository. Now, push it to the original remote repository.
         </p>
         <pre>
-            git push
-        </pre>
+git push</pre>
         <p>
             Reload the github page. Do you see the updated file now?
         </p>
