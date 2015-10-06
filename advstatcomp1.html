@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+<h1>Lab 1</h1>
+    In lab 1, we'll explore some of the ways to represent data structures in R, install a package to analyse our data a bit more, and debug some code.
+    <section>
+        <h2>Installing R</h2>
+        <p>Before we can get going, we need to install R itself.</p>
+        <p>For Windows and Mac, go to the R webiste (or really a local mirror, like the one in <a href="http://ftp.acc.umu.se/mirror/CRAN/">Umeå</a>). Download the 3.2.2 release for your OS and get it installed.</p>
+        <p>If you are using Linux, you are probably better off using the package manager for your Linux distribution. For Ubuntu, you need to install the packages <code>r-base</code> and <code>r-base-dev</code>. There are several ways to do this, from a console, you can write:</p>
+        <pre>
+    sudo apt-get update
+    sudo apt-get install r-base
+    sudo apt-get install r-base-dev
+</pre>
+        <p>For distributions based on Fedora, things are pretty similar, while infinitely different:</p>
+<pre>
+sudo yum install R
+</pre>
+        <p>If you are using something based on Red Hat Enterprise Linux, CentOS, etc, the line above might not work. If so, you first need to allow it finding a repository that includes the R packages. </p>
+        <p>Depending on what your overall distribution is (the teaching assistants and/or the command <code>uname -a</code> might help out with that), use one of the three following lines:
+        </p>
+        <pre>
+            sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+            sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm'
+            sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm'
+        </pre>
+        <p>On UPPMAX nodes, you can use <code>module load R</code>. However, UPPMAX is down today, and it's always useful to be able to test stuff locally (on your own laptop).</p>
+    </section>
+
+    <section>
+        <h2>Looking at a dataset</h2>
+        <p>R is keeping track of modules in the form of <em>libraries</em>. Even the base installation of R consists of several libraries. One of these is <code>datasets</code>, a set of general examples
+        of data that can be used for analysis. Note that even many real packages also contain datasets, in order to demonstrate different functionality, providing calibratin data etc.</p>
+        <p>To use a library, you need to load it. Since <code>datasets</code> is already installed, this is simple.</p>
+        <pre>
+    library(datasets)
+</pre>
+        <p>You might be curious what's in the library. If you want help with any specific word in R, just type a question mark before it.</p>
+        <pre>
+    ?datasts
+</pre>
+        <p>OK, that was not too helpful, but at least we got an instruction what to write instead.</p>
+        <pre>
+            library(help="datasets")
+        </pre>
+        <p>As you can see, there are loads of datasets here. None of them is extremely large, but they range from time series to spatial tables to more structured data.
+        We will go for structured data, since that is more interesting from the perspective of demonstrating the
+        data-handling features of R. We will use the <code>state</code> dataset.</p>
+        <pre>data("state")</pre>
+        <p>This loads several variables into our workspace. Try writing state. and then pressing tab.</p>
+        <pre>
+            state.<em>TAB</em>
+            state.abb      state.area     state.center   state.division state.name state.region   state.x77    
+        </pre>
+        <p>Remember, if you're curious, just read the help. You will need to know what these different variables contain in order to solve the following tasks.</p>
+        <pre>
+        ?state
+        </pre>
+        <p>The most complex part of the dataset is <code>state.x77</code>. Have a look at it:</p>
+        <pre>
+            state.x77
+            <em>Table shown when you press Enter.</em>
+        </pre>
+        <p>You can easily access subsets of objects in R. This can be done by ordinal indices starting at 1, i.e. to get the first row, you can write:</p>
+        <pre>
+            state.x77[1,]
+        </pre>
+        <p>Note that you can leave out the second index to get "everything".</p>
+        <p>What's more special about R is that you can also address by name.</p>
+        <pre>
+            state.x77["Wyoming",]
+        </pre>
+        <p>Rows as well as columns can have names and be indexed by them. Maybe we only want the income data</p>
+        <pre>
+            state.x77[,"Income"]
+        </pre>
+        <p>You can also index by vectors or lists, rather than individual indices. Remember, to create a vector in R, you use the function <code>c</code>.</p>
+        <pre>
+            state.x77[,c("Income", "Murder")]    
+        </pre>
+        <p>Now try to create a small 2 by 2 array with only the illiteracy and high-school graduation data for the states of New York and Idaho. Ask if you don't get it right.</p>
+        <pre>
+        state.x77<em>.....</em>
+</pre>
+        <p>Indices can also be logical, i.e. a set of true/false values that matches the length of the dimension you are addressing.</p>
+        <pre>state.x77[state.region=="Northeast",]</pre>
+    </section>
+    <section>
+        <h2>Analysing your dataset</h2>
+        <p>R provides very rich features for analysing data, not only providing hard numbers, but frequently also already by default summarizing them in nice text summaries and plots. Let's first do a very simple linear regression between income and murder rate.
+            These data are from the 70s, which means even higher murder rates than today in some metropolitan centers. This means that some densely urban states have both a higher murder rate and a high income, somewhat negating the more common socioeconomic relationship
+            between increased income and decreased violent crime. Alaska is also an outlier in several regards.</p>
+        <p>For doing a linear fit, you can use the function <code>lm</code>. You can easily add additional covariates, but the most trivial use is to do something like <code>linearresults <- lm(x ~ y)</code>.
+        </p>
+        <p>Do the regression between income and murder rate for all 50 states and store it in the variable. Then print the a summary of the results using the <code>summary</code> function, <code>summary(linearresults)</code>.
+            What's the sign of the overall correlation? Is it significant (i.e. how small is the <em>p</em> value)?</p>
+        <p>You can also get some automatic plots to explore the data further using the <code>plot</code> function. <code>plot</code> can be applied to many objects in R with specific features relevant to each form of data.</p>
+        <p>Would you say that the relationship makes sense? Did the plots change your mind?</p>
+    </section>
+    <section>
+        <h2>Another package</h2>
+        <p>The real beauty of R is the wealth of additional packages available. Many of these are available through CRAN (The comprehensive R archive network), with <a href="https://cran.r-project.org/">7,000</a> packages and counting.
+            In addition to an alphabetic list, there are also "task views" for fields such as Econometrics, Genetics, MachineLearning etc.
+            Some packages are great, with lots of tested code and good documentation. Some are little more than hacks that someone decided to publish. A package needs to have a maintainer, needs to build against a recent version of R, and needs to
+            be documented in the standard way, at least formally. The standard way consists of a pdf with reference documentation for each element in the package. These also
+            work with the internal "?" help operator in R, which you have already used.</p>
+            <p>Some packages also contain "vignettes",
+            which are supposed to be more user-accessible explanations of the purpose and use of the package. Sometimes they read more like a tutorial, sometimes more like a formal paper describing the methodology.
+        </p>
+        <p>
+            We want to try a smoothing model for our relationship between income and murder rates. To do this, we can install the <code>sm</code> (smoothing) package. Look for the sm package in the CRAN list. You can see some information about the package, like
+            its license, related packages, and more.
+        </p>
+        <p>There are also download links there, but you don't need to use them. Instead, we can install a package from within R.</p>
+        <pre>install.packages("sm")</pre>
+        <p>You might need to specify from what server you want to make the download. Just choose one in Europe, it doesn't matter a a whole lot.</p>
+        <p>Now you have access to the sm package. Easy, right? Let's try it.</p>
+        <pre>
+            library(sm)
+            smresults <- sm.regression(state.x77[,"Income"], state.x77[,"Murder"])
+        </pre>
+        <p>A plot is automatically generated. Look in the help for <code>sm.regression</code> to find out how you would turn it off.</p>
+        <p>The ease of installing packages and the standard ways of representing data in R makes it very easy to test out new approaches.</p>
+    </section>
+    <section>
+        <h2>Debugging and source control</h2>
+        <h3>Preparing your github account</h3>
+        <p>When you edit your code, you want to keep track of what changes you've made. <code>git</code> is one tool for this. <a href="http://www.github.com"><code>github</code></a> is a service where you can host your git repositories (roughly "projects") online and share them with the world.
+            Increasingly, academic projects are available, even pre-publication.</p>
+        <p>Create an account for yourself on github, if you don't already have one.</p>
+        <p>When you find an interesting repository on the net, sometimes you want to work on it yourself, while keeping the version history. Then you can <i>fork</i> it into your own account.</p>
+        <p>Go to <a href="https://github.com/cnettel/uuadvstatcomp"><code>https://github.com/cnettel/uuadvstatcomp</code></a> and fork it. Click the Fork button in the top right corner.</p>
+        <p>You now have your own repository called <code>uuadvstatcomp</code>.</p>
+        <p>You can edit files directly on github and download them, but that's not really the point.</p>
+        <p>What you instead want to do is to use a git client. You can use a command-line client a <a href="https://desktop.github.com">github-specific GUI client</a>.
+            We refer to the videos and links in the lecture, but the main point is that to use a repository locally, you <em>clone</em> it. That gives you the full history of the repository,
+            not only the current version of the files. You can then locally modify and update files and keep track of different versions. The most important operation here is that you <em>commmit</em> changes.
+            A commit consists of a set of update to one or several files, and a commit message as an explanation of what was done.</p>
+        <p>Do <b>not</b> delay committing until you are "done". Instead, commit every time you make a useful change, something you choose to test, some milestone. If you go on for a long time (days, weeks?), just commit to keep the current state.
+            Basically, the point of committing is to be able to go back later and see "what did it look like at that point?".</p>
+        <p>An important difference between git and some other version control systems is that it is <em>distributed</em>. It might be convenient to keep the verison history on github, but in fact, you have a full version control system everywhere where you have cloned your source.
+            Therefore, you can commit files freely and nothing will be visible on github. At a later point, you can then <em>push</em> your local repository updates to the repository on the server.</p>
+
+        <h3>Cloning your repository</h3>
+        <p>These instructions assume the basic command-line git client. Again, you are encouraged to use the github desktop client linked above,
+            but the command-line client can be found at <a href="https://git-scm.com/downloads">git-scm.com</a>.
+        <p>To make github report your user identity correctly, you need to <a href="https://help.github.com/articles/setting-your-email-in-git">configure</a> your
+            e-mail address in git to coincide with the one for your github account. If you don't want to read the details you basically write like this:</p>
+        <pre>git config --global user.email "your.email.address@example.com"</pre>
+        <p>Now, you are ready to clone your repository. You need to specify that it is you who are doing this, and that it is your repository (which is also accessible to others).
+            Therefore, you need to specify your username twice below.</p>
+        <pre>git clone https://<em>username</em>@github.com/<em>username</em>/uuadvstatcomp</pre>
+        <p>A new subdirectory is created called <code>uuadvstatcomp</code>.</p>
+
+        <h3>Debugging a script</h3>
+        <p>We will be working with the file <code>rolldice.R</code>. This code is supposed to roll three dice and stop when the sum is 18 (3 sixes). However, the file contains a few errors.</p>
+        <p>Normally, when you get an error in R, the execution breaks. This is not always convenient when you want to trace errors in your code, especially if you have several levels of functions calling each other.</p>
+        <p>There is a function <pre>recover</pre> in R. It reports the current state of all function calls, you can inspect all environments and also execute code. When you are done, you can continue executing where you are at this point.</p>
+        <p><pre>recover</pre> can be used in two main ways, in response to errors or to add a manual breakpoint.</p>
+        <p>Try to run <code>rolldice.R</code>. Simply write:</p>
+            <pre>source("rolldice.R")</pre>
+        </p>
+        <p>You might need to change the current directory to where you cloned your git repository, there is an option for that on the File menu. You can also use a function <code>setwd("/path/to/new/dir")</code></p>.
+        <p>Nothing happens! What is going on? Eventually, you may hit the red stop button in R to stop the script execution, but you get no more information. It can help to stop the program where the error happens and inspect it. Write the following:</p>
+        <pre>
+            options(error = recover)
+        </pre>
+        <p>This means that the function <code>recover</code> will be called when an error happens. If you go fancy, you can add your own special error handling. Stopping the program with the red stop button is an error in this context.</p>
+        <p>Source the file again. Press the stop button after a while. What happens? You get something like this:</p>
+        <pre>Enter a frame number, or 0 to exit   
+
+1: source("rolldice.R")
+2: eval.with.vis(ei, envir)
+3: eval.with.vis(expr, envir, enclos)
+</pre>
+        <p>Here, you can see what functions are internally called by <code>source</code> to actually evaluate the source of the R file.</p>
+        <p>We want to look at the innermost context. When you are debugging in other cases, it is quite likely that a weird behavior you're seeing
+            is triggered further out. Type 3 and press Enter. Now you can look at all variables that were available before the code was stopped. Just print
+            any R expression to check it, for example <code>dice</code> (the variable name used for the dice values). Enter <code>c</code> followed bey <code>0</code> to quit the debugging
+            when you are done.
+        </p>
+        <p>You can start the script over and over again to try to see a pattern, but that's rather cumbersome, and would be even worse in a more complex script.
+            Instead, edit <code>rolldice.R</code> and add a <code>recover()</code> line after the value of dice is assigned. Now, the execution of the script will break
+            every time this line is reached. You can look at <code>dice</code> every time, and when you press <code>0</code>, the code <em>continues to run</em>. You can even change a variable.
+            Go on, try it, write <code>dice <- c(6,6,6)</code> when you are inside the debugging. What happens?
+        </p>
+        <p>
+            You can naturally also print the values of variables with commands like <code>print</code>, but the power of arbitrarily checking and changing variables in the running code with <code>recover</code> is far more powerful,
+            especially if the problem only arises rarely or in a long-running code.
+        </p>
+        <p>
+            Now try to fix the error in the code. You might want to read the documentation for <code>sample</code> and <code>sum</code>, e.g. <code>?sum</code>.
+        </p>
+    <h3>
+        Store the fix
+    </h3>
+        <p>
+            Save the fixed script file. Now, you can happily commit your fix to the repository.
+        </p>
+        <pre>
+            git commit -m "Some message explaining what change you made" rolldice.R
+        </pre>
+        <p>
+            Check your github version of the repository again. Do you see the fix?
+        </p>
+        <p>
+            You shouldn't see it, since it was only committed to your <em>local</em> repository. Now, push it to the original remote repository.
+        </p>
+        <pre>
+            git push
+        </pre>
+        <p>
+            Reload the github page. Do you see the updated file now?
+        </p>
+        <p>
+            When you have forked a repository and found an important bug, you can make a <em>pull request</em>. This is an organized way
+            of saying "hey there, my version of this repo has some nice additions that you might want to add". In this case, it is a
+            way to demonstrate that you got all the way here and found a suitable fix. Click the Pull request link and file it.
+        </p>
+    </section>
+</body>
+</html>
