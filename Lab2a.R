@@ -8,4 +8,5 @@ do.opt <- function(interval, fun = ofv){
   return(out)
 }
 
+lapply(list(c(0, 100), c(0, 15), c(9, 12), c(10, 11)), do.opt)
 
