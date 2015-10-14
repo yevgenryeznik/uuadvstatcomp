@@ -12,36 +12,37 @@ do.opt <- function(interval, fun = ofv){ # optimization
 lapply(list(c(0, 100), c(0, 15), c(9, 12), c(10, 11)), do.opt)
 
 # integration part --------------------------------------------------
-fun <- function(x){ # function to be integrated
-  return(x*sin(x))
+int.compareness <- function(fun, left, right, n = 15){ # compare different approaches
+  do.int <- function(interval, fcn = fun){ # integration
+    return(integrate(fcn, lower = interval[1], upper = interval[2], subdivisions = 1e7)$value)
+  }
+  print("----- direct integration -----")
+  print(sprintf("integral value = %f", do.int(c(left, right))))
+  print("system time")
+  print(system.time(do.int(c(left, right))))
+
+  print("----- integration with lapply -----")
+  interval <- seq(left, right, length = n)
+  interval <- cbind(interval[-length(interval)], interval[-1])
+  interval <- split(interval, row(interval))
+  
+  print(sprintf("integral value = %f", sum(as.numeric(lapply(interval, do.int)))))
+  print("system time")
+  print(system.time(sum(as.numeric(lapply(interval, do.int)))))
+
+  print("----- integration with parallelization -----")
+  library(parallel)
+  cl.number <- c(1, 2, 4, 8)
+  for (n in cl.number){
+    cl <- makePSOCKcluster(n)
+    print(sprintf("number of clusters = %i", n))
+    print(sprintf("integral value = %f", sum(as.numeric(parLapply(cl, interval, do.int, fcn = fun)))))
+    print("systme time")
+    print(system.time(sum(as.numeric(parLapply(cl, interval, do.int, fcn = fun)))))
+  }
 }
 
-do.int <- function(interval, fcn = fun){ # integration
-  return(integrate(fcn, lower = interval[1], upper = interval[2], subdivisions = 1e7)$value)
-}
+# test for given function: x*sin(x)
+int.compareness(function(x){x*sin(x)}, left = -7e5, right = 7e5)
 
-## direct integration
-# integral evaluation
-print(do.int(c(-7e5, 7e5)))
-# computational time evaluation
-system.time(do.int(c(-7e5, 7e5)))
 
-## integration with lapply
-interval <- seq(-7e5, 7e5, by = 1e5)
-interval <- cbind(interval[-length(interval)], interval[-1])
-interval <- split(interval, row(interval))
-# integral evaluation
-print(sum(as.numeric(lapply(interval, do.int))))
-# computational time evaluation
-system.time(sum(as.numeric(lapply(interval, do.int))))
-
-## integration with parallelization
-library(parallel)
-cl.number <- c(1, 2, 4, 8)
-for (n in cl.number){
-  cl <- makePSOCKcluster(n)
-  # integral evaluation
-  print(sum(as.numeric(parLapply(cl, interval, do.int, fcn = fun))))
-  # computational time evaluation
-  print(system.time(sum(as.numeric(parLapply(cl, interval, do.int, fcn = fun)))))
-}
