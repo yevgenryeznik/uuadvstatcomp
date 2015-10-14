@@ -12,9 +12,9 @@ do.opt <- function(interval, fun = ofv){ # optimization
 lapply(list(c(0, 100), c(0, 15), c(9, 12), c(10, 11)), do.opt)
 
 # integration part --------------------------------------------------
-int.compareness <- function(fun, left, right, n = 15){ # compare different approaches
+int.compareness <- function(fun, left, right, subdiv = 1e7, subint = 15){ # compare different approaches
   do.int <- function(interval, fcn = fun){ # integration
-    return(integrate(fcn, lower = interval[1], upper = interval[2], subdivisions = 1e7)$value)
+    return(integrate(fcn, lower = interval[1], upper = interval[2], subdivisions = subdiv)$value)
   }
   print("----- direct integration -----")
   print(sprintf("integral value = %f", do.int(c(left, right))))
@@ -22,7 +22,7 @@ int.compareness <- function(fun, left, right, n = 15){ # compare different appro
   print(system.time(do.int(c(left, right))))
 
   print("----- integration with lapply -----")
-  interval <- seq(left, right, length = n)
+  interval <- seq(left, right, length = subint)
   interval <- cbind(interval[-length(interval)], interval[-1])
   interval <- split(interval, row(interval))
   
@@ -45,4 +45,6 @@ int.compareness <- function(fun, left, right, n = 15){ # compare different appro
 # test for given function: x*sin(x)
 int.compareness(function(x){x*sin(x)}, left = -7e5, right = 7e5)
 
+# test for my example: exp(x^2)
+int.compareness(function(x){sin(x^2)}, left = 0, right = 500, subint = 50)
 
