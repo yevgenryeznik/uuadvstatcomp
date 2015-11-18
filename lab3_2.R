@@ -75,8 +75,11 @@ logapproxR2 <- function(x, k){
   return (s)
 }
 
+# compile R functions
 logapproxR1cmp <- compiler::cmpfun(logapproxR1)
 logapproxR2cmp <- compiler::cmpfun(logapproxR2)
+
+# Test time of computations
 x <- 0.5
 k <- 45
 microbenchmark::microbenchmark(
@@ -84,6 +87,7 @@ microbenchmark::microbenchmark(
   logapproxR1cmp(x, k),
   logapproxR2cmp(x, k))
 
+# Test time of computations
 x <- 0.01
 k <- 3000
 microbenchmark::microbenchmark(
